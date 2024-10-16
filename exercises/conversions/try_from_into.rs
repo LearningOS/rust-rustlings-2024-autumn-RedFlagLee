@@ -9,7 +9,10 @@
 // Execute `rustlings hint try_from_into` or use the `hint` watch subcommand for
 // a hint.
 
-use std::convert::{TryFrom, TryInto};
+use std::{
+    convert::{TryFrom, TryInto},
+    ops::RangeBounds,
+};
 
 #[derive(Debug, PartialEq)]
 struct Color {
@@ -27,8 +30,6 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
-
 // Your task is to complete this implementation and return an Ok result of inner
 // type Color. You need to create an implementation for a tuple of three
 // integers, an array of three integers, and a slice of integers.
@@ -41,6 +42,18 @@ enum IntoColorError {
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        match tuple {
+            (r, g, b)
+                if (0..=255).contains(&r) && (0..=255).contains(&g) && (0..=255).contains(&b) =>
+            {
+                Ok(Color {
+                    red: r as u8,
+                    green: g as u8,
+                    blue: b as u8,
+                })
+            }
+            _ => Err(IntoColorError::IntConversion),
+        }
     }
 }
 
@@ -48,6 +61,18 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        match arr {
+            [r, g, b]
+                if (0..=255).contains(&r) && (0..=255).contains(&g) && (0..=255).contains(&b) =>
+            {
+                Ok(Color {
+                    red: r as u8,
+                    green: g as u8,
+                    blue: b as u8,
+                })
+            }
+            _ => Err(IntoColorError::IntConversion),
+        }
     }
 }
 
@@ -55,6 +80,22 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            Err(IntoColorError::BadLen)
+        } else {
+            match slice {
+                [r, g, b]
+                    if (0..=255).contains(r) && (0..=255).contains(g) && (0..=255).contains(b) =>
+                {
+                    Ok(Color {
+                        red: *r as u8,
+                        green: *g as u8,
+                        blue: *b as u8,
+                    })
+                }
+                _ => Err(IntoColorError::IntConversion),
+            }
+        }
     }
 }
 
